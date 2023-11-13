@@ -1,0 +1,13 @@
+{
+    "rust-analyzer.linkedProjects": [
+        "./reading_plan_old/Cargo.toml",
+        "./reading_plan/web/Cargo.toml",
+        "./reading_plan/telegram/Cargo.toml",
+        "./reading_plan/telegram/Cargo.toml",
+        "./reading_plan/telegram/Cargo.toml",
+        "./reading_plan/telegram/Cargo.toml",
+        "./reading_plan/telegram/Cargo.toml",
+        "./reading_plan/telegram/Cargo.toml",
+        "./reading_plan/telegram/Cargo.toml"
+    ]
+}
