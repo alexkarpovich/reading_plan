@@ -1,5 +1,16 @@
 use std::env;
-use teloxide::{dispatching::dialogue::InMemStorage, prelude::*};
+use url::Url;
+use teloxide::{
+    dispatching::dialogue::InMemStorage, 
+    prelude::*, 
+    types::{
+        InlineKeyboardMarkup, 
+        InlineKeyboardButton, 
+        InlineKeyboardButtonKind,
+        WebAppInfo
+    }
+};
+
 
 type MyDialogue = Dialogue<State, InMemStorage<State>>;
 type HandlerResult = Result<(), Box<dyn std::error::Error + Send + Sync>>;
@@ -38,7 +49,23 @@ async fn main() {
 }
 
 async fn start(bot: Bot, dialogue: MyDialogue, msg: Message) -> HandlerResult {
-    bot.send_message(msg.chat.id, "Let's start! What's your full name?").await?;
+    let mut markup = InlineKeyboardMarkup::default();
+    let buttons = vec![
+        InlineKeyboardButton::new(
+            "Open web app",
+            InlineKeyboardButtonKind::WebApp(
+                WebAppInfo { url: Url::parse("https://bibleplan.ru")? }
+            )
+        )
+    ];
+    markup = markup.append_row(buttons);
+    
+    bot.send_message(msg.chat.id, "Let's start! What's your full name?")
+        .reply_markup(markup)
+        .send()
+        .await?;
+    
     dialogue.update(State::ReceiveFullName).await?;
+    
     Ok(())
 }
