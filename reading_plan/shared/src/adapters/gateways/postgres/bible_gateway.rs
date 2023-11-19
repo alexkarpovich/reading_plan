@@ -19,9 +19,19 @@ impl PostgresBibleGateway {
 
 #[async_trait]
 impl BibleGateway for PostgresBibleGateway {
-    async fn get_verses_by_range<'a>(
-        &self, _range: Arc<RefRange<'a>>, _lang_code: &str,
+    async fn get_verses_by_range<'b>(
+        &self, _range: Arc<RefRange<'b>>, _lang_code: &str,
     ) -> Result<Arc<Vec<BibleVerse>>, DomainError> {
-        Ok(Arc::new(vec![]))
+
+        let query = "SELECT * FROM bible_verses";
+
+        let query_result = sqlx::query(query)
+            .fetch_all(self.db.as_ref()) // -> Vec<{ country: String, count: i64 }>
+            .await;
+
+        return match query_result {
+            Ok(_) => Ok(Arc::new(vec![])),
+            Err(_) => Err(DomainError::InvalidID)
+        }
     }
 }

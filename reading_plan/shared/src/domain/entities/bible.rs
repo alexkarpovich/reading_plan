@@ -1,21 +1,7 @@
+use std::sync::Arc;
 use chrono::prelude::*;
 use crate::domain::value_objects::ID;
 
-#[derive(Debug)]
-pub struct BibleBook {
-    pub id: ID,
-    pub lang_code: String,
-    pub name: String,
-    pub short: String,
-}
-
-#[derive(Debug)]
-pub struct BibleRef {
-    pub id: ID,
-    pub book_id: ID,
-    pub chapter: i32,
-    pub verse: i32,
-}
 
 #[derive(Debug)]
 pub struct RefRange<'a> {
@@ -23,19 +9,36 @@ pub struct RefRange<'a> {
     pub end: &'a ID,
 }
 
+#[derive(Debug)]
+pub struct BibleVerse {
+    pub id: ID,
+    pub no: u8,
+    pub content: String,
+}
 
 #[derive(Debug)]
-pub struct BibleTranslation {
+pub struct BibleChapter {
     pub id: ID,
-    pub ref_id: ID,
-    pub lang_code: String,
-    pub content: String,
+    pub no: u8,
+    pub name: String,
+    pub verses: Arc<Vec<BibleVerse>>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Debug)]
-pub struct BibleVerse {
-    pub ref_id: ID,
-    pub content: String,
+pub struct BibleBook {
+    pub id: ID,
+    pub no: u8,
+    pub name: String,
+    pub short: String,
+    pub chapters: Arc<Vec<BibleChapter>>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug)]
+pub struct BibleFragment {
+    // translation: ....,
+    pub books: Arc<Vec<BibleBook>>,
 }
