@@ -7,9 +7,11 @@ edition = "2021"
 
 [dependencies]
 shared = { path = "../shared" }
-serde = { workspace = true }
-serde_json = { workspace = true }
-tokio = { workspace = true }
-
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+sqlx.workspace = true
+chrono.workspace = true
+async-trait.workspace = true
 teloxide = "0.12.2"
 url = "2.4.1"

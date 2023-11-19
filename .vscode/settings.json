@@ -8,6 +8,7 @@
         "./reading_plan/telegram/Cargo.toml",
         "./reading_plan/telegram/Cargo.toml",
         "./reading_plan/telegram/Cargo.toml",
-        "./reading_plan/telegram/Cargo.toml"
+        "./reading_plan/telegram/Cargo.toml",
+        "./reading_plan/shared/Cargo.toml"
     ]
 }
