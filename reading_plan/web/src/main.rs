@@ -1,26 +1,12 @@
-use std::sync::Arc;
+mod app_state;
+mod axum_app;
+mod errors;
+mod routing;
+mod schemas;
 
-use shared::app::services::bible_service::BibleService;
-use shared::adapters::gateways::parse_gateway::ParsingGateway;
-use shared::adapters::gateways::postgres::bible_gateway::PostgresBibleGateway;
-use shared::adapters::persistence::postgres::create_pool;
-use shared::app::usecases::bible::GetVersesByRef;
+use crate::axum_app::serve;
 
 #[tokio::main]
 async fn main() {
-    println!("Reading plan web is starting...");
-    let pool = match create_pool().await {
-        Ok(pool) => pool,
-        Err(_) => panic!("DB init error")
-    };
-    let bible_service = BibleService::new(
-        Arc::new(PostgresBibleGateway::new(pool)),
-        Arc::new(ParsingGateway{}),
-    );
-
-    let verses = match bible_service.list_verses_by_ref("Кор 1:3", "ru").await {
-        Ok(verses) => verses,
-        Err(_) => panic!("Get verses error")
-    };
-    println!("{:?}", verses);
+    serve().await;
 }

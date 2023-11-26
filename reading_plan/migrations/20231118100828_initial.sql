@@ -1,12 +1,12 @@
 -- Add migration script here
-CREATE TABLE languages (
+CREATE TABLE IF NOT EXISTS languages (
 	id serial PRIMARY KEY,
 	code CHAR (2) UNIQUE NOT NULL,
 	iso_name VARCHAR (32) NOT NULL,
 	native_name VARCHAR(32) NOT NULL
 );
 
-CREATE TABLE bible_translations (
+CREATE TABLE IF NOT EXISTS bible_translations (
 	id serial PRIMARY KEY,
 	lang_id INT NOT NULL,
 	name VARCHAR (128) NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE bible_translations (
 	  REFERENCES languages(id)
 );
 
-CREATE TABLE bible_books (
+CREATE TABLE IF NOT EXISTS bible_books (
 	id serial PRIMARY KEY,
 	tr_id INT NOT NULL 
 		REFERENCES bible_translations (id) ON DELETE CASCADE,
@@ -29,7 +29,7 @@ CREATE TABLE bible_books (
 	updated_at DATETIME NOT NULL
 );
 
-CREATE TABLE bible_chapters (
+CREATE TABLE IF NOT EXISTS bible_chapters (
 	id serial PRIMARY KEY,
 	book_id INT NOT NULL 
 		REFERENCES bible_books (id) ON DELETE CASCADE,
@@ -42,7 +42,7 @@ CREATE TABLE bible_chapters (
 	updated_at DATETIME NOT NULL
 );
 
-CREATE TABLE bible_verses (
+CREATE TABLE IF NOT EXISTS bible_verses (
 	id serial PRIMARY KEY,
 	chapter_id INT NOT NULL 
 		REFERENCES bible_chapters (id) ON DELETE CASCADE,

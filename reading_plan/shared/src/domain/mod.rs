@@ -1,3 +1,3 @@
 pub mod entities;
-pub mod exceptions;
+pub mod errors;
 pub mod value_objects;

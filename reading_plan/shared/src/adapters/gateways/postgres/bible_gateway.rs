@@ -3,9 +3,11 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use sqlx::{Pool, Postgres};
 
-use crate::domain::entities::bible::{BibleVerse, RefRange};
-use crate::domain::exceptions::DomainError;
+use crate::domain::entities::bible::BibleBookInfo;
+use crate::domain::value_objects::ID;
+use crate::app::errors::AppError;
 use crate::app::gateways::abstract_bible::BibleGateway;
+use crate::adapters::schemas::bible::BibleBookInfoSchema;
 
 pub struct PostgresBibleGateway {
     db: Arc<Pool<Postgres>>,
@@ -19,19 +21,30 @@ impl PostgresBibleGateway {
 
 #[async_trait]
 impl BibleGateway for PostgresBibleGateway {
-    async fn get_verses_by_range<'b>(
-        &self, _range: Arc<RefRange<'b>>, _lang_code: &str,
-    ) -> Result<Arc<Vec<BibleVerse>>, DomainError> {
+    
+    async fn get_books(&self, tr_id: ID) -> Result<Arc<Vec<BibleBookInfo>>, AppError> {
+        let query = "SELECT * FROM bible_books WHERE tr_id=$1";
 
-        let query = "SELECT * FROM bible_verses";
-
-        let query_result = sqlx::query(query)
-            .fetch_all(self.db.as_ref()) // -> Vec<{ country: String, count: i64 }>
-            .await;
+        let select_query = 
+            sqlx::query_as::<_, BibleBookInfoSchema>(query)
+            .bind(tr_id);
+	    let query_result = select_query.fetch_all(self.db.as_ref()).await;
 
         return match query_result {
-            Ok(_) => Ok(Arc::new(vec![])),
-            Err(_) => Err(DomainError::InvalidID)
+            Ok(raw_vec) => {
+                let bible_books = raw_vec.iter()
+                    .map(|raw| BibleBookInfo {
+                        id: raw.id,
+                        no: raw.no as u8,
+                        name: raw.name.to_owned(),
+                        short: raw.short.to_owned(),
+                        created_at: raw.created_at,
+                        updated_at: raw.updated_at,
+                    })
+                    .collect::<Vec<BibleBookInfo>>();
+                Ok(Arc::new(bible_books))
+            },
+            Err(_) => Err(AppError::Base)
         }
     }
 }
