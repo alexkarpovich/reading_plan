@@ -30,7 +30,7 @@ impl BibleService {
 #[async_trait]
 impl ListBooks for BibleService {
     async fn list_books(&self, tr_id: ID) -> Result<Arc<Vec<BibleBookInfo>>, AppError> {
-        let books = self.bible_gateway.get_books(tr_id).await?;
+        let books = self.bible_gateway.list_books(tr_id).await?;
         Ok(books)
     }
 }

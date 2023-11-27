@@ -1,5 +1,6 @@
+use chrono;
 use std::sync::Arc;
-use chrono::prelude::*;
+
 use crate::domain::value_objects::ID;
 
 
@@ -22,8 +23,8 @@ pub struct BibleChapter {
     pub no: u8,
     pub name: String,
     pub verses: Arc<Vec<BibleVerse>>,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 #[derive(Debug)]
@@ -33,8 +34,8 @@ pub struct BibleBook {
     pub name: String,
     pub short: String,
     pub chapters: Arc<Vec<BibleChapter>>,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 #[derive(Debug)]
@@ -50,6 +51,7 @@ pub struct BibleBookInfo {
     pub name: String,
     pub short: String,
     // pub chapters_count: u8,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
+    pub is_new_testament: bool,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }

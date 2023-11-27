@@ -19,12 +19,12 @@ pub async fn router(state: AppState) -> Router {
 }
 
 #[derive(Deserialize)]
-struct Translation {
+struct TrQuery {
     tr_id: ID,
 }
 
 async fn list_books(
-    tr_query: Query<Translation>,
+    tr_query: Query<TrQuery>,
     Extension(bible_service): Extension<BibleService>,
 ) -> impl IntoResponse {
 
@@ -33,12 +33,16 @@ async fn list_books(
         .await
         .unwrap();
 
-    Json(books.iter().map(|x| json!({
-        "id": x.id,
-        "no": x.no,
-        "name": x.name.to_owned(),
-        "short": x.short.to_owned(),
-        "created_at": x.created_at,
-        "updated_at": x.updated_at,
-    })).collect::<Vec<Value>>())
+    Json(
+        books.iter()
+            .map(|x| json!({
+                "id": x.id,
+                "no": x.no,
+                "name": x.name.to_owned(),
+                "short": x.short.to_owned(),
+                "created_at": x.created_at,
+                "updated_at": x.updated_at,
+            }))
+            .collect::<Vec<Value>>()
+    )
 }

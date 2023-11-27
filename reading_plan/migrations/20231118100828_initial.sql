@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS bible_books (
 	short VARCHAR(32) NOT NULL,
 	name VARCHAR (64) UNIQUE NOT NULL,
 	is_new_testament BOOLEAN NOT NULL,
-	created_at DATETIME NOT NULL,
-	updated_at DATETIME NOT NULL
+	created_at TIMESTAMP NOT NULL,
+	updated_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS bible_chapters (
@@ -38,8 +38,8 @@ CREATE TABLE IF NOT EXISTS bible_chapters (
 	
 	no INT NOT NULL,
 	name VARCHAR (256),
-	created_at DATETIME NOT NULL,
-	updated_at DATETIME NOT NULL
+	created_at TIMESTAMP NOT NULL,
+	updated_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS bible_verses (
@@ -51,8 +51,8 @@ CREATE TABLE IF NOT EXISTS bible_verses (
 	
 	no INT NOT NULL,
 	content TEXT NOT NULL,
-	created_at DATETIME NOT NULL,
-	updated_at DATETIME NOT NULL
+	created_at TIMESTAMP NOT NULL,
+	updated_at TIMESTAMP NOT NULL
 );
 
 INSERT INTO languages (id, code, iso_name, native_name) VALUES 
