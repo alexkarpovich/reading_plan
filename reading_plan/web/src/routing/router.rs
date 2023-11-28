@@ -4,9 +4,12 @@ use axum::{Router, Extension};
 use shared::app::services::bible_service::BibleService;
 use shared::adapters::gateways::parse_gateway::ParsingGateway;
 use shared::adapters::gateways::postgres::bible_gateway::PostgresBibleGateway;
+use shared::adapters::gateways::postgres::translation_gateway::PostgresTranslationGateway;
+use shared::app::services::translation_service::TranslationService;
 
 use crate::app_state::AppState;
-use crate::routing::bible_router;
+use crate::routing::{bible_router, translation_router};
+
 
 
 pub async fn router(app_state: AppState) -> Router {
@@ -15,7 +18,13 @@ pub async fn router(app_state: AppState) -> Router {
         Arc::new(ParsingGateway{}),
     );
 
+    let translation_service = TranslationService::new(
+        Arc::new(PostgresTranslationGateway::new(app_state.db.clone())),
+    );
+
     Router::new()
-        .nest("/bible", bible_router::router(app_state).await)
+        .nest("/bible", bible_router::router(app_state.clone()).await)
+        .nest("/translations", translation_router::router(app_state.clone()).await)
         .layer(Extension(bible_service))
+        .layer(Extension(translation_service))
 }

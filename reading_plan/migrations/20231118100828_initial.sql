@@ -238,4 +238,3 @@ INSERT INTO languages (id, code, iso_name, native_name) VALUES
 (180, 'za', 'Zhuang', 'Saɯ cueŋƅ'),
 (181, 'zh', 'Chinese', '中文'),
 (182, 'zu', 'Zulu', 'isiZulu');
-

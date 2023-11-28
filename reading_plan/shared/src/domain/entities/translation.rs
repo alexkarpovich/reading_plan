@@ -6,3 +6,10 @@ pub struct Lang {
     pub code: String,
     pub name: String,
 }
+
+#[derive(Debug)]
+pub struct Translation {
+    pub id: ID,
+    pub lang_id: ID,
+    pub name: String,
+}

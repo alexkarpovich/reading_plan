@@ -1,2 +1,2 @@
 pub mod bible;
-pub mod lang;
+pub mod translation;
