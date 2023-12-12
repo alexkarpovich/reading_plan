@@ -8,6 +8,7 @@ pub struct TranslationSchema {
 	pub id: i32,
     pub lang_id: i32,
 	pub name: String,
+    pub description: String,
 }
 
 impl Into<Translation> for TranslationSchema {
@@ -16,6 +17,7 @@ impl Into<Translation> for TranslationSchema {
             id: ID(self.id),
             lang_id: ID(self.lang_id),
             name: self.name.to_owned(),
+            description: self.description.to_owned(),
         }
     }
 }

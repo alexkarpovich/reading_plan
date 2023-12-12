@@ -1,56 +1,69 @@
 use chrono;
-use std::sync::Arc;
+use serde::Serialize;
 
 use crate::domain::value_objects::ID;
 
 
 #[derive(Debug)]
-pub struct RefRange {
-    pub start: ID,
-    pub end: ID,
+pub struct Ref {
+    pub book: Option<String>,
+    pub chapter: Option<u8>,
+    pub vers: Option<u8>,
 }
 
-#[derive(Debug)]
-pub struct BibleVerse {
+impl Default for Ref {
+    fn default() -> Self {
+        Self {
+            book: None,
+            chapter: None,
+            vers: None,
+        }
+    }
+}
+
+pub type ExcerptRef = (Ref, Ref);
+
+#[derive(Debug, Serialize)]
+pub struct BibleContent {
     pub id: ID,
-    pub no: u8,
-    pub content: String,
+    pub chapter: u8,
+	pub vers: u8,
+	pub text: String,
 }
 
-#[derive(Debug)]
-pub struct BibleChapter {
+#[derive(Debug, Serialize)]
+pub struct BibleContentWithBook {
     pub id: ID,
-    pub no: u8,
-    pub name: String,
-    pub verses: Arc<Vec<BibleVerse>>,
-    pub created_at: chrono::NaiveDateTime,
-    pub updated_at: chrono::NaiveDateTime,
+    pub book_id: ID,
+    pub chapter: u8,
+	pub vers: u8,
+	pub text: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct BibleBook {
     pub id: ID,
     pub no: u8,
+    pub key: String,
     pub name: String,
-    pub short: String,
-    pub chapters: Arc<Vec<BibleChapter>>,
+    pub content: Vec<BibleContent>,
+    pub is_new_testament: bool,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
 }
 
-#[derive(Debug)]
-pub struct BibleFragment {
+#[derive(Debug, Serialize)]
+pub struct BibleExcerpt {
     // translation: ....,
-    pub books: Arc<Vec<BibleBook>>,
+    pub books: Vec<BibleBook>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct BibleBookInfo {
     pub id: ID,
     pub no: u8,
+    pub key: String,
     pub name: String,
-    pub short: String,
-    // pub chapters_count: u8,
     pub is_new_testament: bool,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,

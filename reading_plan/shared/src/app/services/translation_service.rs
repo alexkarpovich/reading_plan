@@ -4,17 +4,17 @@ use async_trait::async_trait;
 use crate::domain::entities::translation::Translation;
 use crate::app::usecases::translation::ListTranslations;
 use crate::app::errors::AppError;
-use crate::app::gateways::abstract_translation::TranslationGateway;
+use crate::app::usecases::gateways::ListTranslationGateway;
 
 
 #[derive(Clone)]
 pub struct TranslationService {
-    translation_gateway: Arc<dyn TranslationGateway>,
+    translation_gateway: Arc<dyn ListTranslationGateway>,
 }
 
 impl TranslationService {
     pub fn new(
-        translation_gateway: Arc<dyn TranslationGateway>, 
+        translation_gateway: Arc<dyn ListTranslationGateway>, 
     ) -> Self {
         Self{translation_gateway}
     }

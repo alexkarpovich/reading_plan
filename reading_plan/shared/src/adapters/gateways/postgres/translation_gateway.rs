@@ -5,7 +5,7 @@ use sqlx::{Pool, Postgres};
 
 use crate::domain::entities::translation::Translation;
 use crate::app::errors::AppError;
-use crate::app::gateways::abstract_translation::TranslationGateway;
+use crate::app::usecases::gateways::ListTranslationGateway;
 use crate::adapters::schemas::translation::TranslationSchema;
 
 pub struct PostgresTranslationGateway {
@@ -19,12 +19,12 @@ impl PostgresTranslationGateway {
 }
 
 #[async_trait]
-impl TranslationGateway for PostgresTranslationGateway {
+impl ListTranslationGateway for PostgresTranslationGateway {
     
     async fn list_translations(&self) -> Result<Arc<Vec<Translation>>, AppError> {
         let select_query = sqlx::query_as!(TranslationSchema, 
             r#"
-            SELECT id, lang_id, name FROM bible_translations
+            SELECT id, lang_id, name, description FROM bible_translations
             "#        
         );
 	    let query_result = select_query.fetch_all(self.db.as_ref()).await;

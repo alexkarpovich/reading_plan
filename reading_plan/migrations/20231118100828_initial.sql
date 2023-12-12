@@ -6,14 +6,16 @@ CREATE TABLE IF NOT EXISTS languages (
 	native_name VARCHAR(32) NOT NULL
 );
 
+CREATE INDEX idx_languages_code
+	ON languages(code);
+
 CREATE TABLE IF NOT EXISTS bible_translations (
 	id serial PRIMARY KEY,
-	lang_id INT NOT NULL,
+	lang_id INT NOT NULL
+		REFERENCES languages (id) ON DELETE CASCADE,
 	name VARCHAR (128) NOT NULL,
-
-	CONSTRAINT fk_lang
-      FOREIGN KEY(lang_id) 
-	  REFERENCES languages(id)
+	description VARCHAR (256) NOT NULL,
+	aliases VARCHAR(32)[] NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS bible_books (
@@ -22,38 +24,47 @@ CREATE TABLE IF NOT EXISTS bible_books (
 		REFERENCES bible_translations (id) ON DELETE CASCADE,
 	
 	no INT NOT NULL,
-	short VARCHAR(32) NOT NULL,
-	name VARCHAR (64) UNIQUE NOT NULL,
+	key VARCHAR (16) NOT NULL,
+	name VARCHAR (64) NOT NULL,
+	aliases VARCHAR(32)[] NOT NULL,
 	is_new_testament BOOLEAN NOT NULL,
 	created_at TIMESTAMP NOT NULL,
-	updated_at TIMESTAMP NOT NULL
+	updated_at TIMESTAMP NOT NULL,
+
+	UNIQUE (tr_id, name),
+	UNIQUE (tr_id, key)
 );
 
-CREATE TABLE IF NOT EXISTS bible_chapters (
+CREATE INDEX idx_bible_books_name
+	ON bible_books(name);
+
+CREATE TABLE IF NOT EXISTS bible_content (
 	id serial PRIMARY KEY,
 	book_id INT NOT NULL 
 		REFERENCES bible_books (id) ON DELETE CASCADE,
-	tr_id INT NOT NULL 
-		REFERENCES bible_translations (id) ON DELETE CASCADE,
-	
-	no INT NOT NULL,
-	name VARCHAR (256),
+	chapter INT NOT NULL,
+	vers INT NOT NULL,
+	text TEXT NOT NULL,
 	created_at TIMESTAMP NOT NULL,
-	updated_at TIMESTAMP NOT NULL
+	updated_at TIMESTAMP NOT NULL,
+
+	UNIQUE (book_id, chapter, vers)
 );
 
-CREATE TABLE IF NOT EXISTS bible_verses (
-	id serial PRIMARY KEY,
-	chapter_id INT NOT NULL 
-		REFERENCES bible_chapters (id) ON DELETE CASCADE,
-	tr_id INT NOT NULL 
-		REFERENCES bible_translations (id) ON DELETE CASCADE,
-	
-	no INT NOT NULL,
-	content TEXT NOT NULL,
-	created_at TIMESTAMP NOT NULL,
-	updated_at TIMESTAMP NOT NULL
-);
+CREATE INDEX idx_bible_content_book_id
+	ON bible_content(book_id);
+
+CREATE VIEW content AS
+  	SELECT bc.*, bb.tr_id as tr_id, bb.no as book_no, 
+		concat_ws(
+			'.', 
+			LPAD(bb.no::text, 3, '0'),
+			LPAD(bc.chapter::text, 3, '0'),
+			LPAD(bc.vers::text, 3, '0')
+		) as key
+	FROM bible_content bc
+	LEFT JOIN bible_books bb ON bb.id = bc.book_id
+	ORDER BY key;
 
 INSERT INTO languages (id, code, iso_name, native_name) VALUES 
 (1, 'aa', 'Afar', 'Afaraf'),

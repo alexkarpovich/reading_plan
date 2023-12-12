@@ -5,21 +5,24 @@ use axum::{
 };
 use serde_json::json;
 
-use shared::adapters::errors::AdapterError;
 use shared::app::errors::AppError;
 use shared::domain::errors::DomainError;
 
 /// Our app's top level error type.
 pub enum Error {
     DomainError(DomainError),
-    /// Something went wrong when calling the user repo.
     AppError(AppError),
-    AdopterError(AdapterError),
 }
 
 impl From<DomainError> for Error {
     fn from(inner: DomainError) -> Self {
         Error::DomainError(inner)
+    }
+}
+
+impl From<AppError> for Error {
+    fn from(inner: AppError) -> Self {
+        Error::AppError(inner)
     }
 }
 
@@ -29,12 +32,10 @@ impl IntoResponse for Error {
             Error::DomainError(DomainError::InvalidID) => {
                 (StatusCode::NOT_FOUND, "User not found")
             }
-            Error::AppError(AppError::Base) => {
-                (StatusCode::UNPROCESSABLE_ENTITY, "Invalid username")
+            Error::AppError(AppError::ParseReferenceError) => {
+                (StatusCode::UNPROCESSABLE_ENTITY, "Parsing reference error")
             }
-            Error::AdopterError(AdapterError::Base) => {
-                (StatusCode::NOT_FOUND, "User not found")
-            }
+            _ => (StatusCode::NOT_FOUND, "Unhandled error"),
         };
 
         let body = Json(json!({

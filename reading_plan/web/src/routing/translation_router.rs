@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use axum::{
     routing::get,
     Json, Router, Extension, response::IntoResponse, 
@@ -16,7 +17,7 @@ pub async fn router(state: AppState) -> Router {
 }
 
 async fn list_translations(
-    Extension(translation_service): Extension<TranslationService>,
+    Extension(translation_service): Extension<Arc<TranslationService>>,
 ) -> impl IntoResponse {
 
     let books = translation_service
