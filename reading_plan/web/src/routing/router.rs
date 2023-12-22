@@ -8,7 +8,7 @@ use shared::app::services::parsing_service::ParsingService;
 use shared::app::services::translation_service::TranslationService;
 
 use crate::app_state::AppState;
-use crate::routing::{bible_router, translation_router};
+use crate::routing::{api, bible_router};
 
 
 
@@ -31,9 +31,10 @@ pub async fn router(app_state: AppState) -> Router {
     );
 
     Router::new()
+        .nest("/api", api::router::router(app_state.clone()).await)
         .nest("/bible", bible_router::router(app_state.clone()).await)
-        .nest("/translations", translation_router::router(app_state.clone()).await)
         .layer(Extension(bible_service))
         .layer(Extension(translation_service))
         .layer(Extension(parsing_service))
+        
 }

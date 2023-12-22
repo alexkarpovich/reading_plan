@@ -1,5 +1,4 @@
 use std::sync::Arc;
-use log::info;
 use async_trait::async_trait;
 
 use crate::app::usecases::bible::{
@@ -41,7 +40,7 @@ impl BibleService {
 
         let excerpt_books = self.bible_gateway.list_excerpt_books(tr_id, start_bk_alias, end_bk_alias).await.unwrap();
 
-        info!("Fragment book boundaries: [{:?}]", excerpt_books);
+        tracing::info!("Fragment book boundaries: [{:?}]", excerpt_books);
 
         Ok(excerpt_books)
     }
@@ -135,7 +134,7 @@ impl GetExcerpt for BibleService {
             excerpt_ref.1.vers,
         );
 
-        info!("Boundary keys: [{start_key}, {end_key}]");
+        tracing::info!("Boundary keys: [{start_key}, {end_key}]");
 
         let mut book_i = 0;
         let mut cur_book = &mut books[book_i];  

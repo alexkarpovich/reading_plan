@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Index{% endblock %}
+
+{% block head %}
+  <style>
+    .exerpt-content {
+        text-align: justify;
+        width: 380px;
+    }
+    sup {
+        color: green;
+        font-size: 0.7em;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+    <div class="exerpt-content">
+        {% for book in exerpt.books %}
+            <div class="col-lg-12">
+                <h3>{{ book.name }}</h3>
+                <table class="verses">
+                    <tbody>
+                        {% for cnt in book.content %}
+                        <tr>
+                            <td>
+                                <a class="anchor" id="{{ cnt.vers }}"></a>
+                                <sup>{{ cnt.vers }}</sup>
+                                {{ cnt.text }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

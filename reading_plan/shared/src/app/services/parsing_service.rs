@@ -1,7 +1,6 @@
 use std::sync::Arc;
 use std::collections::HashMap;
 
-use log::{info, debug};
 use regex::Regex;
 use async_trait::async_trait;
 
@@ -38,7 +37,7 @@ impl ParseReference for ParsingService {
 
         let clean_ref = ParsingService::clean_ref_line(reference);
 
-        info!("Clean reference line: '{clean_ref}'");
+        tracing::info!("Clean reference line: '{clean_ref}'");
 
         let Some(caps) = re.captures(&clean_ref) else { 
             return Err(AppError::ParseReferenceError);    
@@ -50,7 +49,7 @@ impl ParseReference for ParsingService {
             .filter_map(|n| Some((n, caps.name(n)?.as_str())))
             .collect();
 
-        debug!("{dict:?}");
+        tracing::debug!("{dict:?}");
 
         let mut s_ref = Ref::default();
         let mut e_ref = Ref::default();

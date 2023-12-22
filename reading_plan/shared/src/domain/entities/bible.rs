@@ -1,3 +1,4 @@
+use std::fmt;
 use chrono;
 use serde::Serialize;
 
@@ -56,6 +57,12 @@ pub struct BibleBook {
 pub struct BibleExcerpt {
     // translation: ....,
     pub books: Vec<BibleBook>,
+}
+
+impl fmt::Display for BibleExcerpt {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 #[derive(Debug, Serialize)]
