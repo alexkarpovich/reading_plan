@@ -5,8 +5,8 @@ use axum::{
 };
 use serde_json::{json, Value};
 
-use shared::app::usecases::translation::ListTranslations;
-use shared::app::services::translation_service::TranslationService;
+use shared::adapters::factory::service_factory::ServiceFactory;
+use shared::app::factory::AbstractServiceFactory;
 
 use crate::app_state::AppState;
 
@@ -17,11 +17,12 @@ pub async fn router(state: AppState) -> Router {
 }
 
 async fn list_translations(
-    Extension(translation_service): Extension<Arc<TranslationService>>,
+    Extension(service_factory): Extension<Arc<ServiceFactory>>,
 ) -> impl IntoResponse {
+    
+    let list_translations = service_factory.new_list_translations_service();
 
-    let books = translation_service
-        .list_translations()
+    let books = list_translations.execute()
         .await
         .unwrap();
 

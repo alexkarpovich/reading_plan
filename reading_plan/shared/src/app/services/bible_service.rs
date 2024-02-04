@@ -12,21 +12,42 @@ use crate::domain::{
     value_objects::ID,
 };
 use crate::app::errors::AppError;
-use crate::app::usecases::gateways::BibleGateway;
+use crate::app::usecases::gateways::{ListBooksGateway, GetExcerptGateway};
 
 
 #[derive(Clone)]
-pub struct BibleService {
-    bible_gateway: Arc<dyn BibleGateway>,
-    parsing_service: Arc<dyn ParseReference>,
+pub struct ListBooksImpl {
+    bible_gateway: Arc<dyn ListBooksGateway>,
 }
 
-impl BibleService {
+impl ListBooksImpl {
     pub fn new(
-        bible_gateway: Arc<dyn BibleGateway>,
-        parsing_service: Arc<dyn ParseReference>,
+        bible_gateway: Arc<dyn ListBooksGateway>,
     ) -> Self {
-        Self{bible_gateway, parsing_service}
+        Self{bible_gateway}
+    }
+}
+
+#[async_trait]
+impl ListBooks for ListBooksImpl {
+    async fn execute(&self, tr_id: ID) -> Result<Arc<Vec<BibleBookInfo>>, AppError> {
+        let books = self.bible_gateway.list_books(tr_id).await?;
+        Ok(books)
+    }
+}
+
+#[derive(Clone)]
+pub struct GetExcerptImpl {
+    bible_gateway: Arc<dyn GetExcerptGateway>,
+    parse_reference: Arc<dyn ParseReference>,
+}
+
+impl GetExcerptImpl {
+    pub fn new(
+        bible_gateway: Arc<dyn GetExcerptGateway>,
+        parse_reference: Arc<dyn ParseReference>,
+    ) -> Self {
+        Self{bible_gateway, parse_reference}
     }
 
     async fn list_excerpt_books(&self, tr_id: ID, start_book_alias: Option<&str>, end_book_alias: Option<&str>) -> Result<Vec<BibleBook>, AppError> {
@@ -38,7 +59,7 @@ impl BibleService {
             end_bk_alias = e_bk_alias
         }
 
-        let excerpt_books = self.bible_gateway.list_excerpt_books(tr_id, start_bk_alias, end_bk_alias).await.unwrap();
+        let excerpt_books = self.bible_gateway.list_excerpt_books(tr_id, start_bk_alias, end_bk_alias).await?;
 
         tracing::info!("Fragment book boundaries: [{:?}]", excerpt_books);
 
@@ -94,23 +115,13 @@ impl BibleService {
             format!("{:0>3}.{:0>3}.{:0>3}", end[0], end[1], end[2]),
         )
     }
-
-    
 }
 
 #[async_trait]
-impl ListBooks for BibleService {
-    async fn list_books(&self, tr_id: ID) -> Result<Arc<Vec<BibleBookInfo>>, AppError> {
-        let books = self.bible_gateway.list_books(tr_id).await?;
-        Ok(books)
-    }
-}
+impl GetExcerpt for GetExcerptImpl {
 
-#[async_trait]
-impl GetExcerpt for BibleService {
-
-    async fn get_excerpt(&self, tr_id: ID, reference: &str) -> Result<Arc<BibleExcerpt>, AppError> {
-        let excerpt_ref = self.parsing_service.parse_reference(reference).await.unwrap();
+    async fn execute(&self, tr_id: ID, reference: &str) -> Result<Arc<BibleExcerpt>, AppError> {
+        let excerpt_ref = self.parse_reference.execute(reference).await?;
         let start_book_alias = excerpt_ref.0.book.as_ref().unwrap();
         let mut end_book_alias = start_book_alias;
         
@@ -120,12 +131,12 @@ impl GetExcerpt for BibleService {
 
         let mut books = self.list_excerpt_books(
             tr_id, Some(start_book_alias), Some(end_book_alias),
-        ).await.unwrap();
+        ).await?;
 
         let start_book = books.first().unwrap();
         let end_book = books.last().unwrap();
 
-        let (start_key, end_key) = BibleService::get_fragment_indexes(
+        let (start_key, end_key) = GetExcerptImpl::get_fragment_indexes(
             start_book.no, 
             excerpt_ref.0.chapter, 
             excerpt_ref.0.vers,
@@ -138,7 +149,7 @@ impl GetExcerpt for BibleService {
 
         let mut book_i = 0;
         let mut cur_book = &mut books[book_i];  
-        let content_vec = self.bible_gateway.list_excerpt_content(tr_id, &start_key, &end_key).await.unwrap();
+        let content_vec = self.bible_gateway.list_excerpt_content(tr_id, &start_key, &end_key).await?;
         
         for content in &content_vec {
             if content.book_id != cur_book.id {
@@ -154,6 +165,6 @@ impl GetExcerpt for BibleService {
             });
         }
         
-        Ok(Arc::new(BibleExcerpt { books: books }))
+        Ok(Arc::new(BibleExcerpt { books }))
     }
 }

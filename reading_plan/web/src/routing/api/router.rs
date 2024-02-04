@@ -8,7 +8,6 @@ use crate::app_state::AppState;
 use crate::routing::api::{bible_router, translation_router};
 
 
-
 pub async fn router(app_state: AppState) -> Router {
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST])

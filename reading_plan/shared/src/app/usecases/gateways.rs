@@ -28,5 +28,3 @@ pub trait ListTranslationGateway: Send + Sync {
     /// Returns list of Translations
     async fn list_translations(&self) -> Result<Arc<Vec<Translation>>, AppError>;
 }
-
-pub trait BibleGateway: ListBooksGateway+GetExcerptGateway {}

@@ -6,20 +6,17 @@ use async_trait::async_trait;
 
 use crate::domain::entities::bible::{Ref, ExcerptRef};
 use crate::app::errors::AppError;
-use crate::app::usecases::parsing::{ParseReference, CleanReference};
+use crate::app::usecases::parsing::ParseReference;
 
 #[derive(Clone)]
-pub struct ParsingService {}
+pub struct ParseReferenceImpl {}
 
-impl ParsingService {
+impl ParseReferenceImpl {
     pub fn new() -> Self {
         Self{}
     }
-}
 
-
-impl CleanReference for ParsingService {
-    fn clean_ref_line(line: &str) -> String {
+    fn clean_ref(line: &str) -> String {
         let re = Regex::new(r"[ _]{2,}").unwrap();
         let reduced_line = re.replace_all(line, " ").into_owned();
 
@@ -27,15 +24,14 @@ impl CleanReference for ParsingService {
     }
 }
 
-
 #[async_trait]
-impl ParseReference for ParsingService {
-    async fn parse_reference(&self, reference: &str) -> Result<Arc<ExcerptRef>, AppError> {
+impl ParseReference for ParseReferenceImpl {
+    async fn execute(&self, reference: &str) -> Result<Arc<ExcerptRef>, AppError> {
         let re = Regex::new(
             r"^(?<s_bk>\d*[ _]?[^\W\d_]+)(?:[ _]?(?<s_ch>\d+)(?:[ _]?:[ _]?(?<s_vers>\d+))?)?(?:[ _]?-[ _]?(?<e_bk>\d*[ _]?[^\W\d_]+)?(?:[ _]?(?<e_ch>\d+)(?:[ _]?:[ _]?(?<e_vers>\d+))?)?)?$"
         ).unwrap();
 
-        let clean_ref = ParsingService::clean_ref_line(reference);
+        let clean_ref = ParseReferenceImpl::clean_ref(reference);
 
         tracing::info!("Clean reference line: '{clean_ref}'");
 
@@ -81,4 +77,3 @@ impl ParseReference for ParsingService {
         Ok(Arc::new((s_ref, e_ref)))
     }
 }
-

@@ -7,8 +7,7 @@ use axum::{
 use askama::Template;
 use serde::Deserialize;
 
-use shared::{domain::{value_objects::ID, entities::bible::BibleExcerpt}, app::usecases::bible::GetExcerpt};
-use shared::app::services::bible_service::BibleService;
+use shared::{domain::{value_objects::ID, entities::bible::BibleExcerpt}, adapters::factory::service_factory::ServiceFactory, app::factory::AbstractServiceFactory};
 
 use crate::app_state::AppState;
 
@@ -27,17 +26,18 @@ struct TrQuery {
 #[derive(Template)]
 #[template(path = "exerpt.html")]
 struct ExerptTemplate { 
-    exerpt: Arc<BibleExcerpt>,
+    excerpt: Arc<BibleExcerpt>,
 }
 
-async fn get_excerpt(
-    tr_query: Query<TrQuery>,
-    Path(reference): Path<String>,
-    Extension(bible_service): Extension<Arc<BibleService>>,
-) -> impl IntoResponse {
 
-    let exerpt = bible_service.get_excerpt(tr_query.tr_id, &reference).await.unwrap();
-    let exerpt_tmpl = ExerptTemplate{exerpt: exerpt};
+async fn get_excerpt(
+    Path(reference): Path<String>,
+    tr_query: Query<TrQuery>,
+    Extension(service_factory): Extension<Arc<ServiceFactory>>,
+) -> impl IntoResponse {
+    let get_excerpt_service = service_factory.new_get_excerpt_service();
+    let excerpt = get_excerpt_service.execute(tr_query.tr_id, &reference).await.unwrap();
+    let exerpt_tmpl = ExerptTemplate{excerpt};
 
     Html(exerpt_tmpl.render().unwrap())
 }

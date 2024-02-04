@@ -12,7 +12,7 @@ use crate::domain::entities::bible::{
 use crate::domain::value_objects::ID;
 use crate::app::errors::AppError;
 use crate::app::usecases::gateways::{
-    ListBooksGateway, GetExcerptGateway, BibleGateway, 
+    ListBooksGateway, GetExcerptGateway, 
 };
 
 pub struct PostgresBibleGateway {
@@ -24,8 +24,6 @@ impl PostgresBibleGateway {
         PostgresBibleGateway { db }
     }
 }
-
-impl BibleGateway for PostgresBibleGateway {}
 
 #[async_trait]
 impl ListBooksGateway for PostgresBibleGateway {

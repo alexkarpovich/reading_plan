@@ -19,15 +19,7 @@ pub trait ParseReference: Send + Sync {
     /// - "Кор_1" 
     /// - "Кор_1-Флс_2:3"
     /// 
-    async fn parse_reference(
+    async fn execute(
         &self, reference: &str
     ) -> Result<Arc<ExcerptRef>, AppError>;
-}
-
-pub trait CleanReference: Send + Sync {
-    ///
-    /// Replaces extra spaces, space-substitutes with single space char
-    /// and returns cleaned ref line.
-    /// 
-    fn clean_ref_line(line: &str) -> String;
 }
